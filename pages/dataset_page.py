@@ -49,8 +49,12 @@ def show_dataset_page():
             return
 
         try:
+            # Ensure 'data' directory exists
+            if not os.path.exists('data'):
+                os.makedirs('data')
+
             # Save the uploaded file to a new file in your directory
-            save_path = "data/user_uploaded_dataset.csv"
+            save_path = r"data/User_uploaded_datasets/user_uploaded_dataset.csv"
             df_uploaded.to_csv(save_path, index=False)
 
             st.success("Thank you for uploading your dataset. This will help improve our model.")
@@ -65,7 +69,7 @@ def show_dataset_page():
         feedback = st.text_area("Please enter your feedback here:")
         submit_button = st.button("Submit Feedback")
 
-    # If the user enters some feedback and clicks the submit button, save it to a file
-    if feedback and submit_button:
-        with open("feedback.txt", "a") as f:
-            f.write(feedback)
+        # If the user enters some feedback and clicks the submit button, save it to a file
+        if feedback and submit_button:
+            with open("feedback.txt", "a") as f:
+                f.write(feedback)
