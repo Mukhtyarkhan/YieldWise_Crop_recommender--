@@ -30,14 +30,14 @@ def show_dataset_page():
     df=pd.read_csv(r"data/Crop_recommendation.csv")
     st.title("Dataset")
     st.write(df)
-        # Add a file uploader widget
+     # Add a file uploader widget
     uploaded_file = st.file_uploader("If you have a related dataset, you can upload it here")
 
     # If a file is uploaded
     if uploaded_file is not None:
         # Check the file extension
         file_extension = os.path.splitext(uploaded_file.name)[1]
-        
+
         if file_extension == '.csv':
             df_uploaded = pd.read_csv(uploaded_file)
         elif file_extension == '.xlsx':
@@ -46,27 +46,26 @@ def show_dataset_page():
             df_uploaded = pd.read_json(uploaded_file)
         else:
             st.error("Invalid file type. Please upload a CSV, XLSX, or JSON file.")
-          #return
+            return
 
         try:
             # Save the uploaded file to a new file in your directory
-            save_path = r"data/user_uploaded_dataset.csv"
-            df_uploaded.to_csv(os.path.join(save_path, "user_uploaded_dataset.csv"), index=False)
-
-            #st.title("Uploaded Dataset")
-            #st.write(df_uploaded)
+            save_path = "data/user_uploaded_dataset.csv"
+            df_uploaded.to_csv(save_path, index=False)
 
             st.success("Thank you for uploading your dataset. This will help improve our model.")
         except Exception as e:
             st.error(f"Error: {e}")
-         # Add a checkbox widget to ask the user if they want to provide feedback
+
+    # Add a checkbox widget to ask the user if they want to provide feedback
     feedback_checkbox = st.checkbox("Do you have any feedback?")
 
     # If the checkbox is checked, add a text area widget for the user to enter their feedback
     if feedback_checkbox:
         feedback = st.text_area("Please enter your feedback here:")
+        submit_button = st.button("Submit Feedback")
 
-        # If the user enters some feedback, save it to a file
-        if feedback:
-            with open("feedback.txt", "w") as f:
-                f.write(feedback)
+    # If the user enters some feedback and clicks the submit button, save it to a file
+    if feedback and submit_button:
+        with open("feedback.txt", "a") as f:
+            f.write(feedback)
