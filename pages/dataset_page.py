@@ -12,7 +12,6 @@ def show_dataset_page():
         return "#{:02x}{:02x}{:02x}".format(r, g, b)
 
     hex_background_color = rgb_to_hex(background_color)
-    #sidebar_color = "#4E6C50"
 
     # Apply background color to the page body
     st.markdown(
@@ -30,7 +29,8 @@ def show_dataset_page():
     df=pd.read_csv(r"data/Crop_recommendation.csv")
     st.title("Dataset")
     st.write(df)
-     # Add a file uploader widget
+    
+    # Add a file uploader widget
     uploaded_file = st.file_uploader("If you have a related dataset, you can upload it here")
 
     # If a file is uploaded
@@ -50,11 +50,11 @@ def show_dataset_page():
 
         try:
             # Ensure 'data' directory exists
-            if not os.path.exists('data'):
-                os.makedirs('data')
+            if not os.path.exists('data/User_uploaded_datasets'):
+                os.makedirs('data/User_uploaded_datasets')
 
             # Save the uploaded file to a new file in your directory
-            save_path = r"data/User_uploaded_datasets/user_uploaded_dataset.csv"
+            save_path = f"data/User_uploaded_datasets/{uploaded_file.name}"
             df_uploaded.to_csv(save_path, index=False)
 
             st.success("Thank you for uploading your dataset. This will help improve our model.")
@@ -72,4 +72,5 @@ def show_dataset_page():
         # If the user enters some feedback and clicks the submit button, save it to a file
         if feedback and submit_button:
             with open("feedback.txt", "a") as f:
-                f.write(feedback)
+                f.write(feedback + "\n")
+            st.success("Thank you for your feedback!")
