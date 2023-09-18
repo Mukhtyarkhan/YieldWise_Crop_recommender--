@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 def show_dataset_page():
     background_color = "rgb(78, 108, 80)"
@@ -30,6 +32,8 @@ def show_dataset_page():
     st.title("Dataset")
     st.write(df)
     
+
+
     # Add a file uploader widget
     uploaded_file = st.file_uploader("If you have a related dataset, you can upload it here")
 
@@ -46,18 +50,24 @@ def show_dataset_page():
             df_uploaded = pd.read_json(uploaded_file)
         else:
             st.error("Invalid file type. Please upload a CSV, XLSX, or JSON file.")
-            return
+            st.stop()
 
         try:
-            # Ensure 'data' directory exists
-            if not os.path.exists('data/User_uploaded_datasets'):
-                os.makedirs('data/User_uploaded_datasets')
+            # Authenticate with Google Sheets API using your credentials JSON file
+            scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+            creds = ServiceAccountCredentials.from_json_keyfile_name('my_json_key.json', scope)
+            client = gspread.authorize(creds)
 
-            # Save the uploaded file to a new file in your directory
-            save_path = f"data/User_uploaded_datasets/{uploaded_file.name}"
-            df_uploaded.to_csv(save_path, index=False)
+            # Open the Google Sheet by title
+            sheet_name = "user_upolded_dataset"
+            sheet = client.open(sheet_name).sheet1
 
-            st.success("Thank you for uploading your dataset. This will help improve our model.")
+            # Append the uploaded data to the Google Sheet
+            df_to_upload = df_uploaded.fillna("")  # Replace NaN values with empty strings
+            values = df_to_upload.values.tolist()
+            sheet.insert_rows(values, 2)  # Insert the data at the second row (modify as needed)
+
+            st.success("Thank you for uploading your dataset. This data has been saved to Google Sheets.")
         except Exception as e:
             st.error(f"Error: {e}")
 
@@ -69,8 +79,23 @@ def show_dataset_page():
         feedback = st.text_area("Please enter your feedback here:")
         submit_button = st.button("Submit Feedback")
 
-        # If the user enters some feedback and clicks the submit button, save it to a file
+        # If the user enters some feedback and clicks the submit button, save it to a Google Sheet
         if feedback and submit_button:
-            with open("feedback.txt", "a") as f:
-                f.write(feedback + "\n")
-            st.success("Thank you for your feedback!")
+            try:
+                # Authenticate with Google Sheets API using your credentials JSON file (if not already authenticated)
+                scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+                creds = ServiceAccountCredentials.from_json_keyfile_name('my_json_key.json', scope)
+                client = gspread.authorize(creds)
+
+                # Open the Google Sheet for feedback by title
+                feedback_sheet_name = "user_feedback"
+                feedback_sheet = client.open(feedback_sheet_name).sheet1
+
+                # Append the feedback to the Google Sheet
+                feedback_data = [[feedback]]
+                feedback_sheet.insert_rows(feedback_data, 2)  # Insert the feedback at the second row (modify as needed)
+
+                st.success("Thank you for your feedback!")
+            except Exception as e:
+                st.error(f"Error: {e}")
+

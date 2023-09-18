@@ -7,6 +7,8 @@ import tensorflow as tf
 from tensorflow import keras
 import pickle
 import os
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 def show_services_page():
     background_color = "rgb(78, 108, 80)"
@@ -199,9 +201,28 @@ def show_services_page():
     ph = st.number_input(ph_label)
     rainfall = st.number_input(rainfall_label)
     # Define the function to save the user input data and crop recommendation to a CSV file
+    # Define your Google Sheets credentials
+    scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+
+    # Define the path to your service account JSON key file
+    json_keyfile_path = 'my_json_key.json'
+
+    # Load the service account credentials
+    creds = ServiceAccountCredentials.from_json_keyfile_name(json_keyfile_path, scope)
+
+    # Authorize the Google Sheets API
+    client = gspread.authorize(creds)
+
+    # Specify the name of the Google Sheet where you want to save the data
+    sheet_name = "user_input_data"
+
+    # Get the Google Sheet by name
+    sheet = client.open(sheet_name).sheet1
+    local_csv_path = 'data/user_input_data.csv'
+
     def save_user_input(N, P, K, temperature, humidity, ph, rainfall, crop):
         # Create a DataFrame with the user input data and crop recommendation
-        df = pd.DataFrame({
+        data = {
             'N': [N],
             'P': [P],
             'K': [K],
@@ -210,10 +231,16 @@ def show_services_page():
             'ph': [ph],
             'rainfall': [rainfall],
             'crop': [crop]
-        })
-        
-        # Append the DataFrame to the CSV file
-        df.to_csv(r'data/user_input_data.csv', mode='a', header=False, index=False)
+        }
+        df = pd.DataFrame(data)
+
+        # Convert the DataFrame to a list of lists
+        values = df.values.tolist()
+
+        # Append the data to the Google Sheet
+        sheet.insert_rows(values, value_input_option='RAW')
+        #sheet.append_table([df])
+        df.to_csv(local_csv_path, mode='a', header=False, index=False)
 
     # Call the save_user_input function when the user clicks the Submit button
     if st.button(submit_button_label):
