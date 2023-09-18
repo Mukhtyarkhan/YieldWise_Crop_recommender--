@@ -9,6 +9,7 @@ import tensorflow as tf
 from tensorflow import keras
 import pickle
 import os
+import gspread
 
 # Set Streamlit to have a responsive layout
 st.set_page_config(
