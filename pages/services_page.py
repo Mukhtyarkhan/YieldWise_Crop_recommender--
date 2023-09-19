@@ -66,10 +66,10 @@ def show_services_page():
         N_label = 'Enter nitrogens quantity'
         P_label = 'Enter Phosphorus quantity'
         K_label = 'Enter Potassiums quantity'
-        temperature_label = 'Enter Temperature quantity '
-        humidity_label = 'Enter Humidity quantity'
+        temperature_label = 'Enter Temperature quantity in (℃)'
+        humidity_label = 'Enter Humidity quantity in %'
         ph_label = 'Enter pH quantity'
-        rainfall_label = 'Enter Rainfall quantity'
+        rainfall_label = 'Enter Rainfall quantity in mm'
         submit_button_label = 'Submit'
         
         crop_names = {
