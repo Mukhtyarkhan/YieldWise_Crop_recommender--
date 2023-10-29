@@ -204,7 +204,7 @@ def show_services_page():
     # Define your Google Sheets credentials
     scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
 
-    # Define the path to your service account JSON key file
+    # Define the path to service account JSON key file
     json_keyfile_path = 'my_json_key.json'
 
     # Load the service account credentials
@@ -213,7 +213,7 @@ def show_services_page():
     # Authorize the Google Sheets API
     client = gspread.authorize(creds)
 
-    # Specify the name of the Google Sheet where you want to save the data
+    # Specify the name of the Google Sheet where I want to save the data
     sheet_name = "user_input_data"
 
     # Get the Google Sheet by name
